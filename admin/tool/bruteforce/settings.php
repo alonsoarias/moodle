@@ -78,5 +78,21 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // Message displayed when access is blocked.
+    $settings->add(new admin_setting_configtext(
+        'tool_bruteforce/blockedmessage',
+        get_string('blockedmessage', 'tool_bruteforce'),
+        '',
+        get_string('blockedmessage', 'tool_bruteforce')
+    ));
+
+    // Time window for revoking freshly created tokens.
+    $settings->add(new admin_setting_configduration(
+        'tool_bruteforce/tokenrevokewindow',
+        get_string('tokenrevokewindow', 'tool_bruteforce'),
+        get_string('tokenrevokewindow_desc', 'tool_bruteforce'),
+        5
+    ));
+
     $ADMIN->add('security', $settings);
 }

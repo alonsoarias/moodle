@@ -5,6 +5,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use advanced_testcase;
 use tool_bruteforce\api;
+use context_system;
 
 /**
  * Unit tests for bruteforce API.
@@ -88,5 +89,40 @@ class api_test extends advanced_testcase {
         // Check if one day block was created
         $this->assertTrue($DB->record_exists('tool_bruteforce_oneday', ['ip' => '10.0.0.1']));
         $this->assertTrue(api::is_blocked(null, '10.0.0.1'));
+    }
+
+    public function test_token_revoked_when_blocked() {
+        global $DB;
+        $this->resetAfterTest();
+
+        // Prepare config.
+        set_config('tokenrevokewindow', 60, 'tool_bruteforce');
+
+        // Create user and block it.
+        $user = $this->getDataGenerator()->create_user();
+        $ip = '9.9.9.9';
+        api::block($user->id, $ip, 120);
+
+        // Simulate token creation from that IP.
+        $_SERVER['REMOTE_ADDR'] = $ip;
+        $token = (object) [
+            'token' => 'abc',
+            'userid' => $user->id,
+            'tokentype' => 0,
+            'timecreated' => time(),
+            'contextid' => \context_system::instance()->id,
+            'creatorid' => $user->id,
+        ];
+        $tokenid = $DB->insert_record('external_tokens', $token);
+
+        $event = \core\event\webservice_token_created::create([
+            'objectid' => $tokenid,
+            'relateduserid' => $user->id,
+            'other' => ['auto' => true],
+        ]);
+        $event->trigger();
+
+        $this->assertFalse($DB->record_exists('external_tokens', ['id' => $tokenid]));
+        $this->assertTrue($DB->record_exists('tool_bruteforce_audit', ['eventtype' => 'revoketoken', 'userid' => $user->id]));
     }
 }

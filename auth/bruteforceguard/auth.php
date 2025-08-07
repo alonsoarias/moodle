@@ -56,10 +56,25 @@ class auth_plugin_bruteforceguard extends auth_plugin_base {
      * Blocks the request early if the IP or user is blocked by tool_bruteforce.
      */
     public function loginpage_hook() {
+        global $DB;
+
+        // Resolve requesting IP and (if supplied) the user id of the username.
         $ip = getremoteaddr(null);
         $userid = null;
+        $username = optional_param('username', '', PARAM_RAW_TRIMMED);
+        if ($username !== '') {
+            $record = $DB->get_record('user', ['username' => $username, 'deleted' => 0], 'id', IGNORE_MISSING);
+            if ($record) {
+                $userid = (int)$record->id;
+            }
+        }
+
         if (\tool_bruteforce\api::is_blocked($userid, $ip)) {
-            throw new \moodle_exception('blocked', 'auth_bruteforceguard');
+            $msg = (string) get_config('tool_bruteforce', 'blockedmessage');
+            if ($msg === '') {
+                $msg = get_string('blockedmessage', 'tool_bruteforce');
+            }
+            throw new \moodle_exception('blocked', 'auth_bruteforceguard', '', $msg);
         }
     }
 }

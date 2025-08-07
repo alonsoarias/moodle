@@ -23,4 +23,5 @@
  */
 
 $string['pluginname'] = 'Brute force guard';
-$string['blocked'] = 'Unable to log in at this time.';
+// Displayed when a request is blocked; the actual text is provided via the tool_bruteforce setting.
+$string['blocked'] = '{$a}';
