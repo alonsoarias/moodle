@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 if ($hassiteconfig) {
     $settings = new admin_settingpage('tool_bruteforce', get_string('pluginname', 'tool_bruteforce'));
 
+    // Soft threshold configuration
     $settings->add(new admin_setting_configtext(
         'tool_bruteforce/thresholdsoft',
         get_string('thresholdsoft', 'tool_bruteforce'),
@@ -35,6 +36,7 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // Soft block duration
     $settings->add(new admin_setting_configduration(
         'tool_bruteforce/durationsoft',
         get_string('durationsoft', 'tool_bruteforce'),
@@ -42,6 +44,7 @@ if ($hassiteconfig) {
         300
     ));
 
+    // Hard threshold configuration
     $settings->add(new admin_setting_configtext(
         'tool_bruteforce/thresholdhard',
         get_string('thresholdhard', 'tool_bruteforce'),
@@ -50,6 +53,7 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    // Hard block duration
     $settings->add(new admin_setting_configduration(
         'tool_bruteforce/durationhard',
         get_string('durationhard', 'tool_bruteforce'),
@@ -57,6 +61,7 @@ if ($hassiteconfig) {
         3600
     ));
 
+    // Time window for counting attempts
     $settings->add(new admin_setting_configduration(
         'tool_bruteforce/window',
         get_string('window', 'tool_bruteforce'),
@@ -64,6 +69,7 @@ if ($hassiteconfig) {
         300
     ));
 
+    // One day block threshold
     $settings->add(new admin_setting_configtext(
         'tool_bruteforce/onedaythreshold',
         get_string('onedaythreshold', 'tool_bruteforce'),

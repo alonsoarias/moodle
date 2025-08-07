@@ -1,6 +1,5 @@
 <?php
 // Language strings for tool_bruteforce.
-
 $string['pluginname'] = 'Bruteforce protection';
 $string['thresholdsoft'] = 'Soft threshold';
 $string['thresholdsoft_desc'] = 'Failed attempts before a short block.';
@@ -23,3 +22,5 @@ $string['lists'] = 'Manage lists';
 $string['delete'] = 'Delete';
 $string['confirmdelete'] = 'Are you sure you want to delete this entry?';
 $string['blockedmessage'] = 'Unable to log in at this time.';
+$string['none'] = 'None';
+$string['bruteforce:manage'] = 'Manage bruteforce protection';
