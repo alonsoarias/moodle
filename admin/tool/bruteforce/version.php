@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2024040100;    // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version   = 2024040200;    // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2022041900;    // Requires Moodle 4.1.
 $plugin->component = 'tool_bruteforce';
 $plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = '0.1';
+$plugin->release   = '0.2';

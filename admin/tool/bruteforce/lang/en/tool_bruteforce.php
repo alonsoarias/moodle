@@ -1,9 +1,26 @@
 <?php
 // Language strings for tool_bruteforce.
-
 $string['pluginname'] = 'Bruteforce protection';
-$string['threshold'] = 'Failed login threshold';
-$string['threshold_desc'] = 'Number of failed attempts allowed before blocking.';
+$string['thresholdsoft'] = 'Soft threshold';
+$string['thresholdsoft_desc'] = 'Failed attempts before a short block.';
+$string['durationsoft'] = 'Soft block duration';
+$string['durationsoft_desc'] = 'How long the soft block lasts.';
+$string['thresholdhard'] = 'Hard threshold';
+$string['thresholdhard_desc'] = 'Failed attempts before a long block.';
+$string['durationhard'] = 'Hard block duration';
+$string['durationhard_desc'] = 'How long the hard block lasts.';
+$string['onedaythreshold'] = 'One-day block threshold';
+$string['onedaythreshold_desc'] = 'Failed attempts before blocking an IP for one day.';
 $string['window'] = 'Time window';
 $string['window_desc'] = 'Period in seconds during which failed attempts are counted.';
+$string['whitelist'] = 'Whitelist';
+$string['blacklist'] = 'Blacklist';
+$string['ip'] = 'IP or CIDR';
+$string['comment'] = 'Comment';
+$string['add'] = 'Add';
+$string['lists'] = 'Manage lists';
+$string['delete'] = 'Delete';
+$string['confirmdelete'] = 'Are you sure you want to delete this entry?';
 $string['blockedmessage'] = 'Unable to log in at this time.';
+$string['none'] = 'None';
+$string['bruteforce:manage'] = 'Manage bruteforce protection';
