@@ -125,4 +125,21 @@ class api_test extends advanced_testcase {
         $this->assertFalse($DB->record_exists('external_tokens', ['id' => $tokenid]));
         $this->assertTrue($DB->record_exists('tool_bruteforce_audit', ['eventtype' => 'revoketoken', 'userid' => $user->id]));
     }
+
+    public function test_coalesce_identical_attempts() {
+        global $DB;
+        $this->resetAfterTest();
+
+        set_config('thresholdsoft', 2, 'tool_bruteforce');
+        set_config('durationsoft', 60, 'tool_bruteforce');
+        set_config('window', 300, 'tool_bruteforce');
+        set_config('coalescewindow', 60, 'tool_bruteforce');
+
+        api::failed(null, '1.2.3.4');
+        api::failed(null, '1.2.3.4');
+
+        $record = $DB->get_record('tool_bruteforce_attempts', ['userid' => null, 'ip' => '1.2.3.4']);
+        $this->assertEquals(1, $record->count);
+        $this->assertFalse(api::is_blocked(null, '1.2.3.4'));
+    }
 }

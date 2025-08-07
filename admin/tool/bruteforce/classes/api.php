@@ -23,6 +23,17 @@ class api {
             return; // Never count.
         }
 
+        // Coalesce identical attempts within configured window to reduce DB load.
+        $coalesce = (int) get_config('tool_bruteforce', 'coalescewindow');
+        if ($coalesce > 0) {
+            $cache = \cache::make('tool_bruteforce', 'coalesce');
+            $key = sha1(($userid ?? 0) . '|' . $ip);
+            if ($cache->get($key)) {
+                return; // Skip counting the same attempt.
+            }
+            $cache->set($key, 1, $coalesce);
+        }
+
         $record = $DB->get_record('tool_bruteforce_attempts', ['userid' => $userid, 'ip' => $ip]);
         $now = time();
         if ($record) {
@@ -87,15 +98,28 @@ class api {
         if (self::is_blacklisted($ip)) {
             return true;
         }
-        $now = time();
-        if ($DB->record_exists_select('tool_bruteforce_oneday', 'ip = :ip AND unblocktime > :now', ['ip' => $ip, 'now' => $now])) {
-            return true;
+
+        $cache = \cache::make('tool_bruteforce', 'isblocked');
+        $key = ($userid ?? 0) . '|' . $ip;
+        $cached = $cache->get($key);
+        if ($cached !== false) {
+            return (bool) $cached;
         }
-        return $DB->record_exists_select('tool_bruteforce_blocks', 'ip = :ip AND (userid IS NULL OR userid = :userid) AND unblocktime > :now', [
-            'ip' => $ip,
-            'userid' => $userid,
-            'now' => $now,
-        ]);
+
+        $now = time();
+        $blocked = false;
+        if ($DB->record_exists_select('tool_bruteforce_oneday', 'ip = :ip AND unblocktime > :now', ['ip' => $ip, 'now' => $now])) {
+            $blocked = true;
+        } else {
+            $blocked = $DB->record_exists_select('tool_bruteforce_blocks', 'ip = :ip AND (userid IS NULL OR userid = :userid) AND unblocktime > :now', [
+                'ip' => $ip,
+                'userid' => $userid,
+                'now' => $now,
+            ]);
+        }
+
+        $cache->set($key, $blocked, 60);
+        return $blocked;
     }
 
     /**
@@ -112,6 +136,7 @@ class api {
             'timecreated' => time(),
         ];
         $DB->insert_record('tool_bruteforce_oneday', $record);
+        \cache::make('tool_bruteforce', 'isblocked')->purge();
         self::log('oneday', $ip, null, '', 'threshold', $duration);
     }
 
@@ -123,7 +148,13 @@ class api {
      */
     public static function is_whitelisted(string $ip): bool {
         global $CFG;
-        return !empty($CFG->allowedip) && address_in_subnet($ip, $CFG->allowedip);
+        $cache = \cache::make('tool_bruteforce', 'corelists');
+        $lists = $cache->get('lists');
+        if ($lists === false) {
+            $lists = ['allowedip' => $CFG->allowedip, 'blockedip' => $CFG->blockedip];
+            $cache->set('lists', $lists);
+        }
+        return !empty($lists['allowedip']) && address_in_subnet($ip, $lists['allowedip']);
     }
 
     /**
@@ -134,7 +165,13 @@ class api {
      */
     public static function is_blacklisted(string $ip): bool {
         global $CFG;
-        return !empty($CFG->blockedip) && address_in_subnet($ip, $CFG->blockedip);
+        $cache = \cache::make('tool_bruteforce', 'corelists');
+        $lists = $cache->get('lists');
+        if ($lists === false) {
+            $lists = ['allowedip' => $CFG->allowedip, 'blockedip' => $CFG->blockedip];
+            $cache->set('lists', $lists);
+        }
+        return !empty($lists['blockedip']) && address_in_subnet($ip, $lists['blockedip']);
     }
 
     /**
@@ -153,6 +190,7 @@ class api {
             'timecreated' => time(),
         ];
         $DB->insert_record('tool_bruteforce_blocks', $record);
+        \cache::make('tool_bruteforce', 'isblocked')->purge();
         self::log('block', $ip, $userid, '', 'threshold', $duration);
     }
 
