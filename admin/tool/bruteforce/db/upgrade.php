@@ -120,5 +120,12 @@ function xmldb_tool_bruteforce_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2024040300, 'tool', 'bruteforce');
     }
 
+    if ($oldversion < 2024040400) {
+        if (!get_config('tool_bruteforce', 'tokenrevokewindow')) {
+            set_config('tokenrevokewindow', 5, 'tool_bruteforce');
+        }
+        upgrade_plugin_savepoint(true, 2024040400, 'tool', 'bruteforce');
+    }
+
     return true;
 }

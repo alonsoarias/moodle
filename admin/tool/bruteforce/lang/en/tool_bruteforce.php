@@ -22,5 +22,7 @@ $string['lists'] = 'Manage lists';
 $string['delete'] = 'Delete';
 $string['confirmdelete'] = 'Are you sure you want to delete this entry?';
 $string['blockedmessage'] = 'Unable to log in at this time.';
+$string['tokenrevokewindow'] = 'Token revocation window';
+$string['tokenrevokewindow_desc'] = 'Time after creation (in seconds) within which tokens are removed when the request is blocked.';
 $string['none'] = 'None';
 $string['bruteforce:manage'] = 'Manage bruteforce protection';

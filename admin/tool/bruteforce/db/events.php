@@ -12,4 +12,9 @@ $observers = [
         'callback'    => '\\tool_bruteforce\\observers::user_loggedin',
         'priority'    => 9999,
     ],
+    [
+        'eventname'   => '\\core\\event\\webservice_token_created',
+        'callback'    => '\\tool_bruteforce\\observers::webservice_token_created',
+        'priority'    => 9999,
+    ],
 ];

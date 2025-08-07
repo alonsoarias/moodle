@@ -157,6 +157,28 @@ class api {
     }
 
     /**
+     * Revoke a recently created web service token.
+     *
+     * @param int $tokenid Token id.
+     * @param int $userid User id owning the token.
+     * @param string $ip IP address used when requesting the token.
+     */
+    public static function revoke_token(int $tokenid, int $userid, string $ip): void {
+        global $DB;
+
+        $window = (int) get_config('tool_bruteforce', 'tokenrevokewindow');
+        if ($window <= 0) {
+            return;
+        }
+
+        $token = $DB->get_record('external_tokens', ['id' => $tokenid], 'id, timecreated');
+        if ($token && (time() - (int)$token->timecreated) <= $window) {
+            $DB->delete_records('external_tokens', ['id' => $tokenid]);
+            self::log('revoketoken', $ip, $userid, '', 'recenttoken', null);
+        }
+    }
+
+    /**
      * Write an audit log entry.
      *
      * @param string $eventtype

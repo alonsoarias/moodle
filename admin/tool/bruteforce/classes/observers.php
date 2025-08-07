@@ -25,7 +25,20 @@ class observers {
      */
     public static function user_loggedin(\core\event\user_loggedin $event): void {
         $ip = getremoteaddr(null);
-        $userid = $event->userid;
+       $userid = $event->userid;
         api::success($userid, $ip);
+    }
+
+    /**
+     * Revoke freshly created tokens if the requester is blocked.
+     *
+     * @param \core\event\webservice_token_created $event
+     */
+    public static function webservice_token_created(\core\event\webservice_token_created $event): void {
+        $ip = getremoteaddr(null);
+        $userid = $event->relateduserid;
+        if (api::is_blocked($userid, $ip)) {
+            api::revoke_token($event->objectid, $userid, $ip);
+        }
     }
 }
