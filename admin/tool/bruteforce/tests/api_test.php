@@ -47,12 +47,8 @@ class api_test extends advanced_testcase {
         global $DB;
         $this->resetAfterTest();
 
-        // Add IP to whitelist
-        $DB->insert_record('tool_bruteforce_whitelist', [
-            'ip' => '127.0.0.1',
-            'comment' => 'Test whitelist',
-            'timecreated' => time()
-        ]);
+        // Add IP to core whitelist
+        set_config('allowedip', '127.0.0.1');
 
         // Configure threshold
         set_config('thresholdsoft', 1, 'tool_bruteforce');
@@ -70,12 +66,8 @@ class api_test extends advanced_testcase {
         global $DB;
         $this->resetAfterTest();
 
-        // Add IP to blacklist
-        $DB->insert_record('tool_bruteforce_blacklist', [
-            'ip' => '192.168.1.1',
-            'comment' => 'Test blacklist',
-            'timecreated' => time()
-        ]);
+        // Add IP to core blacklist
+        set_config('blockedip', '192.168.1.1');
 
         // Should be blocked immediately without any failed attempts
         $this->assertTrue(api::is_blocked(null, '192.168.1.1'));

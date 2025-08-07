@@ -1,12 +1,9 @@
 # Bruteforce protection tool for Moodle
 
-This is an experimental implementation that records failed login attempts
-and blocks users or IP addresses after a configurable number of failures.
-
-The implementation is intentionally minimal and serves as a starting point
-for further development. It uses Moodle's events API to listen for
-`\core\event\user_login_failed` and `\core\event\user_loggedin` events and
-stores counters in custom database tables.
+This plugin records failed login attempts and blocks users or IP addresses
+after a configurable number of failures. It relies on Moodle's core IP
+allow and deny lists (`allowedip` and `blockedip`) rather than maintaining
+its own copies.
 
 ## Disclaimer
 
