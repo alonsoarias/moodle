@@ -24,5 +24,7 @@ $string['confirmdelete'] = 'Are you sure you want to delete this entry?';
 $string['blockedmessage'] = 'Unable to log in at this time.';
 $string['tokenrevokewindow'] = 'Token revocation window';
 $string['tokenrevokewindow_desc'] = 'Time after creation (in seconds) within which tokens are removed when the request is blocked.';
+$string['coalescewindow'] = 'Coalesce window';
+$string['coalescewindow_desc'] = 'Identical attempts from the same user and IP within this period (in seconds) are ignored.';
 $string['none'] = 'None';
 $string['bruteforce:manage'] = 'Manage bruteforce protection';

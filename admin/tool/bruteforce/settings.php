@@ -94,5 +94,13 @@ if ($hassiteconfig) {
         5
     ));
 
+    // Coalesce window.
+    $settings->add(new admin_setting_configduration(
+        'tool_bruteforce/coalescewindow',
+        get_string('coalescewindow', 'tool_bruteforce'),
+        get_string('coalescewindow_desc', 'tool_bruteforce'),
+        0
+    ));
+
     $ADMIN->add('security', $settings);
 }
