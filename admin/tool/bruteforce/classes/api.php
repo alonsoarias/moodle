@@ -112,6 +112,7 @@ class api {
             'timecreated' => time(),
         ];
         $DB->insert_record('tool_bruteforce_oneday', $record);
+        self::log('oneday', $ip, null, '', 'threshold', $duration);
     }
 
     /**
@@ -121,10 +122,8 @@ class api {
      * @return bool
      */
     public static function is_whitelisted(string $ip): bool {
-        global $DB;
-        $records = $DB->get_records_menu('tool_bruteforce_whitelist', null, '', 'id, ip');
-        $list = implode(',', $records);
-        return $list && address_in_subnet($ip, $list);
+        global $CFG;
+        return !empty($CFG->allowedip) && address_in_subnet($ip, $CFG->allowedip);
     }
 
     /**
@@ -134,10 +133,8 @@ class api {
      * @return bool
      */
     public static function is_blacklisted(string $ip): bool {
-        global $DB;
-        $records = $DB->get_records_menu('tool_bruteforce_blacklist', null, '', 'id, ip');
-        $list = implode(',', $records);
-        return $list && address_in_subnet($ip, $list);
+        global $CFG;
+        return !empty($CFG->blockedip) && address_in_subnet($ip, $CFG->blockedip);
     }
 
     /**
@@ -156,5 +153,31 @@ class api {
             'timecreated' => time(),
         ];
         $DB->insert_record('tool_bruteforce_blocks', $record);
+        self::log('block', $ip, $userid, '', 'threshold', $duration);
+    }
+
+    /**
+     * Write an audit log entry.
+     *
+     * @param string $eventtype
+     * @param string $ip
+     * @param int|null $userid
+     * @param string $username
+     * @param string $reason
+     * @param int|null $duration
+     */
+    protected static function log(string $eventtype, string $ip, ?int $userid = null,
+            string $username = '', string $reason = '', ?int $duration = null): void {
+        global $DB;
+        $record = (object) [
+            'ip' => $ip,
+            'userid' => $userid,
+            'username' => $username,
+            'eventtype' => $eventtype,
+            'reason' => $reason,
+            'duration' => $duration,
+            'timecreated' => time(),
+        ];
+        $DB->insert_record('tool_bruteforce_audit', $record);
     }
 }

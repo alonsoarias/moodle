@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../../../config.php');
 require_login();
 require_capability('tool/bruteforce:manage', context_system::instance());
+global $CFG;
 
 $PAGE->set_url(new moodle_url('/admin/tool/bruteforce/index.php'));
 $PAGE->set_context(context_system::instance());
@@ -10,11 +11,9 @@ $PAGE->set_heading(get_string('pluginname', 'tool_bruteforce'));
 
 echo $OUTPUT->header();
 
-// Navigation links for whitelist and blacklist management
-$whitelisturl = new moodle_url('/admin/tool/bruteforce/lists.php', ['list' => 'whitelist']);
-$blacklisturl = new moodle_url('/admin/tool/bruteforce/lists.php', ['list' => 'blacklist']);
-echo html_writer::div(html_writer::link($whitelisturl, get_string('whitelist', 'tool_bruteforce')));
-echo html_writer::div(html_writer::link($blacklisturl, get_string('blacklist', 'tool_bruteforce')));
+// Core lists are managed via Site administration / Security / IP blocker.
+echo html_writer::div(get_string('allowediplist', 'admin') . ': ' . s($CFG->allowedip));
+echo html_writer::div(get_string('blockediplist', 'admin') . ': ' . s($CFG->blockedip));
 
 global $DB;
 
