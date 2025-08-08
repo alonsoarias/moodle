@@ -200,6 +200,38 @@ class api {
         return $lists;
     }
 
+    /**
+     * Add a username to a list.
+     *
+     * @param string $list whitelist or blacklist
+     * @param string $username username to add
+     * @param string $comment optional comment
+     */
+    public static function add_user_to_list(string $list, string $username, string $comment = ''): void {
+        global $DB;
+        $table = $list === 'blacklist' ? 'tool_bruteforce_ublacklist' : 'tool_bruteforce_uwhitelist';
+        $record = (object) [
+            'username' => core_text::strtolower($username),
+            'comment' => $comment ?: null,
+            'timecreated' => time(),
+        ];
+        $DB->insert_record($table, $record);
+        \cache::make('tool_bruteforce', 'userlists')->purge();
+    }
+
+    /**
+     * Remove a username entry from a list.
+     *
+     * @param string $list whitelist or blacklist
+     * @param int $id record id to remove
+     */
+    public static function remove_user_from_list(string $list, int $id): void {
+        global $DB;
+        $table = $list === 'blacklist' ? 'tool_bruteforce_ublacklist' : 'tool_bruteforce_uwhitelist';
+        $DB->delete_records($table, ['id' => $id]);
+        \cache::make('tool_bruteforce', 'userlists')->purge();
+    }
+
     /** Block an IP for one day. */
     protected static function block_ip_for_oneday(string $ip): void {
         global $DB;
