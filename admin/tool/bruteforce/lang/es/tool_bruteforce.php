@@ -58,6 +58,7 @@ $string['confirmbulkunlock'] = '¿Seguro que deseas desbloquear las entradas sel
 $string['filters'] = 'Filtros';
 $string['resetfilters'] = 'Restablecer filtros';
 $string['searchplaceholder'] = 'Buscar...';
+$string['exportcsv'] = 'Exportar CSV';
 $string['privacy:metadata:userid'] = 'ID de usuario';
 $string['privacy:metadata:username'] = 'Nombre de usuario';
 $string['privacy:metadata:ip'] = 'Dirección IP';

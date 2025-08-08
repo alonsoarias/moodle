@@ -53,6 +53,7 @@ $string['confirmbulkunlock'] = 'Are you sure you want to unblock the selected en
 $string['filters'] = 'Filters';
 $string['resetfilters'] = 'Reset filters';
 $string['searchplaceholder'] = 'Search...';
+$string['exportcsv'] = 'Export CSV';
 $string['privacy:metadata:userid'] = 'User ID';
 $string['privacy:metadata:username'] = 'Username';
 $string['privacy:metadata:ip'] = 'IP address';

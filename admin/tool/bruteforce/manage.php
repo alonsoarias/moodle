@@ -155,6 +155,142 @@ switch ($section) {
         }
         break;
 
+    case 'history':
+        require_capability('tool/bruteforce:view', $context);
+
+        $filterip = optional_param('filterip', '', PARAM_RAW_TRIMMED);
+        $filteruser = optional_param('filteruser', '', PARAM_RAW_TRIMMED);
+        $filterevent = optional_param('filterevent', '', PARAM_ALPHA);
+        $download = optional_param('download', '', PARAM_ALPHA);
+
+        $params = [];
+        $where = '1=1';
+        if ($filterip !== '') {
+            $where .= ' AND ip LIKE :ip';
+            $params['ip'] = $filterip . '%';
+        }
+        if ($filteruser !== '') {
+            $where .= ' AND username LIKE :uname';
+            $params['uname'] = core_text::strtolower($filteruser) . '%';
+        }
+        if ($filterevent !== '') {
+            $where .= ' AND eventtype = :ev';
+            $params['ev'] = $filterevent;
+        }
+
+        $records = $DB->get_records_sql("SELECT * FROM {tool_bruteforce_audit} WHERE $where ORDER BY timecreated DESC", $params);
+
+        if ($download === 'csv') {
+            require_once($CFG->libdir . '/csvlib.class.php');
+            $export = new csv_export_writer();
+            $export->set_filename('bruteforce_history');
+            $export->add_data([get_string('event', 'tool_bruteforce'), get_string('ip', 'tool_bruteforce'),
+                get_string('username'), get_string('reason', 'tool_bruteforce'), get_string('duration', 'tool_bruteforce'),
+                get_string('created', 'tool_bruteforce')]);
+            foreach ($records as $r) {
+                $export->add_data([$r->eventtype, $r->ip, $r->username, $r->reason, $r->duration,
+                    userdate($r->timecreated)]);
+            }
+            $export->download_file();
+            exit;
+        }
+
+        echo html_writer::start_tag('form', ['method' => 'get', 'class' => 'mform']);
+        echo html_writer::start_div('filters');
+        echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'section', 'value' => 'history']);
+        echo html_writer::empty_tag('input', ['type' => 'text', 'name' => 'filterip', 'value' => s($filterip),
+            'placeholder' => get_string('ip', 'tool_bruteforce')]);
+        echo html_writer::empty_tag('input', ['type' => 'text', 'name' => 'filteruser', 'value' => s($filteruser),
+            'placeholder' => get_string('user')]);
+        echo html_writer::select(['' => get_string('event', 'tool_bruteforce'), 'failed' => 'failed',
+            'loggedin' => 'loggedin', 'block' => 'block', 'oneday' => 'oneday', 'revoketoken' => 'revoketoken'],
+            'filterevent', $filterevent, false);
+        echo html_writer::empty_tag('input', ['type' => 'submit', 'value' => get_string('apply', 'tool_bruteforce')]);
+        echo html_writer::link(new moodle_url($baseurl, ['section' => 'history']),
+            get_string('resetfilters', 'tool_bruteforce'));
+        echo html_writer::link(new moodle_url($baseurl, ['section' => 'history', 'download' => 'csv',
+            'filterip' => $filterip, 'filteruser' => $filteruser, 'filterevent' => $filterevent]),
+            get_string('exportcsv', 'tool_bruteforce'), ['class' => 'ml-2']);
+        echo html_writer::end_div();
+        echo html_writer::end_tag('form');
+
+        $table = new html_table();
+        $table->head = [
+            get_string('event', 'tool_bruteforce'),
+            get_string('ip', 'tool_bruteforce'),
+            get_string('username'),
+            get_string('reason', 'tool_bruteforce'),
+            get_string('duration', 'tool_bruteforce'),
+            get_string('created', 'tool_bruteforce'),
+        ];
+
+        foreach ($records as $r) {
+            $table->data[] = [s($r->eventtype), s($r->ip), s($r->username), s($r->reason),
+                $r->duration ? format_time($r->duration) : '', userdate($r->timecreated)];
+        }
+
+        if (!empty($table->data)) {
+            echo html_writer::table($table);
+        } else {
+            echo $OUTPUT->notification(get_string('none', 'tool_bruteforce'), 'notifymessage');
+        }
+        break;
+
+    case 'lists':
+        require_capability('tool/bruteforce:manage', $context);
+        require_once($CFG->dirroot . '/admin/tool/bruteforce/classes/form/userlist_form.php');
+
+        $delw = optional_param('delw', 0, PARAM_INT);
+        $delb = optional_param('delb', 0, PARAM_INT);
+        if ($delw && confirm_sesskey()) {
+            \tool_bruteforce\api::remove_user_from_list('whitelist', $delw);
+            redirect(new moodle_url($baseurl, ['section' => 'lists']));
+        }
+        if ($delb && confirm_sesskey()) {
+            \tool_bruteforce\api::remove_user_from_list('blacklist', $delb);
+            redirect(new moodle_url($baseurl, ['section' => 'lists']));
+        }
+
+        $whitelistform = new \tool_bruteforce\form\userlist_form(new moodle_url($baseurl,
+            ['section' => 'lists']), ['list' => 'whitelist']);
+        if ($data = $whitelistform->get_data()) {
+            \tool_bruteforce\api::add_user_to_list('whitelist', $data->username, $data->comment);
+            redirect(new moodle_url($baseurl, ['section' => 'lists']));
+        }
+        $blacklistform = new \tool_bruteforce\form\userlist_form(new moodle_url($baseurl,
+            ['section' => 'lists']), ['list' => 'blacklist']);
+        if ($data = $blacklistform->get_data()) {
+            \tool_bruteforce\api::add_user_to_list('blacklist', $data->username, $data->comment);
+            redirect(new moodle_url($baseurl, ['section' => 'lists']));
+        }
+
+        echo html_writer::tag('h3', get_string('whitelist', 'tool_bruteforce'));
+        $whitelistform->display();
+        $records = $DB->get_records('tool_bruteforce_uwhitelist', null, 'timecreated DESC');
+        $table = new html_table();
+        $table->head = [get_string('username'), get_string('comment', 'tool_bruteforce'),
+            get_string('created', 'tool_bruteforce'), get_string('actions')];
+        foreach ($records as $r) {
+            $del = new moodle_url($baseurl, ['section' => 'lists', 'delw' => $r->id, 'sesskey' => sesskey()]);
+            $table->data[] = [s($r->username), s($r->comment), userdate($r->timecreated),
+                html_writer::link($del, get_string('delete'))];
+        }
+        echo html_writer::table($table);
+
+        echo html_writer::tag('h3', get_string('blacklist', 'tool_bruteforce'));
+        $blacklistform->display();
+        $records = $DB->get_records('tool_bruteforce_ublacklist', null, 'timecreated DESC');
+        $table = new html_table();
+        $table->head = [get_string('username'), get_string('comment', 'tool_bruteforce'),
+            get_string('created', 'tool_bruteforce'), get_string('actions')];
+        foreach ($records as $r) {
+            $del = new moodle_url($baseurl, ['section' => 'lists', 'delb' => $r->id, 'sesskey' => sesskey()]);
+            $table->data[] = [s($r->username), s($r->comment), userdate($r->timecreated),
+                html_writer::link($del, get_string('delete'))];
+        }
+        echo html_writer::table($table);
+        break;
+
     case 'dashboard':
     default:
         require_capability('tool/bruteforce:view', $context);
