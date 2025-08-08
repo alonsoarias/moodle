@@ -61,3 +61,5 @@ $string['privacy:metadata:attempts'] = 'Failed login attempts.';
 $string['privacy:metadata:blocks'] = 'Active blocks.';
 $string['privacy:metadata:oneday'] = 'One-day blocks.';
 $string['privacy:metadata:audit'] = 'Audit log entries.';
+$string['privacy:metadata:userlist'] = 'User allow/deny lists.';
+$string['privacy:metadata:comment'] = 'Comment for the entry.';

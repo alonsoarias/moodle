@@ -289,5 +289,18 @@ function xmldb_tool_bruteforce_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2024040601, 'tool', 'bruteforce');
     }
 
+    if ($oldversion < 2024040602) {
+        // Rename user list tables to shorter names to satisfy cross-DB identifier limits.
+        $table = new xmldb_table('tool_bruteforce_userwhitelist');
+        if ($dbman->table_exists($table) && !$dbman->table_exists('tool_bruteforce_uwhitelist')) {
+            $dbman->rename_table($table, 'tool_bruteforce_uwhitelist');
+        }
+        $table = new xmldb_table('tool_bruteforce_userblacklist');
+        if ($dbman->table_exists($table) && !$dbman->table_exists('tool_bruteforce_ublacklist')) {
+            $dbman->rename_table($table, 'tool_bruteforce_ublacklist');
+        }
+        upgrade_plugin_savepoint(true, 2024040602, 'tool', 'bruteforce');
+    }
+
     return true;
 }
