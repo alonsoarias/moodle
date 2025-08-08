@@ -1,10 +1,20 @@
 <?php
 define('CLI_SCRIPT', true);
 require(__DIR__ . '/../../../config.php');
+require_once($CFG->libdir.'/clilib.php');
 
-$enable = optional_param('enable', null, PARAM_BOOL);
-if ($enable === null) {
-    cli_error('Specify --enable=1 or --enable=0');
+list($options, $unrecognized) = cli_get_params([
+    'enable' => false,
+    'disable' => false,
+    'help' => false,
+], ['h' => 'help']);
+
+if ($options['help'] || (!$options['enable'] && !$options['disable'])) {
+    $help = "Toggle rescue mode\n\n--enable   Enable rescue mode\n--disable  Disable rescue mode\n";
+    cli_writeln($help);
+    exit(0);
 }
-set_config('tool_bruteforce_rescue', $enable);
-cli_writeln('Rescue mode ' . ($enable ? 'enabled' : 'disabled'));
+
+$state = $options['enable'] ? 1 : 0;
+set_config('tool_bruteforce_rescue', $state);
+cli_writeln('Rescue mode ' . ($state ? 'enabled' : 'disabled'));

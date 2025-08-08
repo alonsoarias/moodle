@@ -18,4 +18,9 @@ $definitions = [
     'coalesce' => [
         'mode' => cache_store::MODE_REQUEST,
     ],
+    // Cached copies of user whitelist/blacklist.
+    'userlists' => [
+        'mode' => cache_store::MODE_REQUEST,
+        'ttl' => 300,
+    ],
 ];
