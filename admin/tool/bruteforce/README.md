@@ -1,12 +1,18 @@
 # Bruteforce protection tool for Moodle
 
-This plugin records failed login attempts and blocks users or IP addresses
-after a configurable number of failures. It relies on Moodle's core IP
-allow and deny lists (`allowedip` and `blockedip`) rather than maintaining
-its own copies.
+This plugin records failed login attempts and blocks users, IP addresses or
+the combination according to configurable soft and hard thresholds. It honours
+Moodle's core allow/deny IP lists and adds user white/black lists, one-day
+blocking, audit history and background tasks. The companion authentication
+plugin `auth_bruteforceguard` stops blocked requests on the login page and
+revokes freshly created web service tokens.
 
-## Disclaimer
+## Features
 
-This plugin is **incomplete** and missing many features described in the
-project specification such as whitelists, notifications, and detailed UI.
-Use at your own risk.
+* Thresholds per axis (IP, user and user+IP) with independent durations.
+* Core `allowedip`/`blockedip` precedence followed by user white/black lists.
+* One-day automatic blocks for abusive IPs.
+* CSV exportable audit log and management UI under *Site administration → Security*.
+* CLI helpers for blocking/unblocking and rescue mode.
+* Scheduled tasks for purging expired data and rotating history.
+
