@@ -16,9 +16,9 @@ class api_test extends advanced_testcase {
         global $CFG, $DB;
         $this->resetAfterTest();
 
-        // Configure soft threshold settings
-        set_config('thresholdsoft', 1, 'tool_bruteforce');
-        set_config('durationsoft', 60, 'tool_bruteforce');
+        // Configure soft threshold settings for IP axis
+        set_config('ip_thresholdsoft', 1, 'tool_bruteforce');
+        set_config('ip_durationsoft', 60, 'tool_bruteforce');
         set_config('window', 60, 'tool_bruteforce');
 
         // Test that a single failed login creates a block
@@ -52,8 +52,8 @@ class api_test extends advanced_testcase {
         set_config('allowedip', '127.0.0.1');
 
         // Configure threshold
-        set_config('thresholdsoft', 1, 'tool_bruteforce');
-        set_config('durationsoft', 60, 'tool_bruteforce');
+        set_config('ip_thresholdsoft', 1, 'tool_bruteforce');
+        set_config('ip_durationsoft', 60, 'tool_bruteforce');
         set_config('window', 60, 'tool_bruteforce');
 
         // Try to trigger a block
@@ -101,7 +101,7 @@ class api_test extends advanced_testcase {
         // Create user and block it.
         $user = $this->getDataGenerator()->create_user();
         $ip = '9.9.9.9';
-        api::block($user->id, $ip, 120);
+        api::block($user->id, null, $ip, 120);
 
         // Simulate token creation from that IP.
         $_SERVER['REMOTE_ADDR'] = $ip;
@@ -130,8 +130,8 @@ class api_test extends advanced_testcase {
         global $DB;
         $this->resetAfterTest();
 
-        set_config('thresholdsoft', 2, 'tool_bruteforce');
-        set_config('durationsoft', 60, 'tool_bruteforce');
+        set_config('ip_thresholdsoft', 2, 'tool_bruteforce');
+        set_config('ip_durationsoft', 60, 'tool_bruteforce');
         set_config('window', 300, 'tool_bruteforce');
         set_config('coalescewindow', 60, 'tool_bruteforce');
 
@@ -147,11 +147,11 @@ class api_test extends advanced_testcase {
         global $DB;
         $this->resetAfterTest();
         $user = $this->getDataGenerator()->create_user(['username' => 'foo']);
-        $DB->insert_record('tool_bruteforce_userblacklist', ['username' => 'foo', 'timecreated' => time()]);
+        $DB->insert_record('tool_bruteforce_ublacklist', ['username' => 'foo', 'timecreated' => time()]);
         \cache::make('tool_bruteforce', 'userlists')->purge();
         $this->assertTrue(api::is_user_blacklisted($user->id, 'foo'));
 
-        $DB->insert_record('tool_bruteforce_userwhitelist', ['username' => 'bar', 'timecreated' => time()]);
+        $DB->insert_record('tool_bruteforce_uwhitelist', ['username' => 'bar', 'timecreated' => time()]);
         \cache::make('tool_bruteforce', 'userlists')->purge();
         $this->assertTrue(api::is_user_whitelisted(null, 'bar'));
     }
