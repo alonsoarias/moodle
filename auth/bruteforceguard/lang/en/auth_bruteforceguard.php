@@ -25,3 +25,4 @@
 $string['pluginname'] = 'Brute force guard';
 // Displayed when a request is blocked; the actual text is provided via the tool_bruteforce setting.
 $string['blocked'] = '{$a}';
+

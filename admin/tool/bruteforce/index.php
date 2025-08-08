@@ -32,3 +32,4 @@ echo html_writer::div(get_string('allowediplist', 'admin') . ': ' . s($CFG->allo
 echo html_writer::div(get_string('blockediplist', 'admin') . ': ' . s($CFG->blockedip));
 
 echo $OUTPUT->footer();
+

@@ -23,8 +23,9 @@ echo $OUTPUT->header();
 
 $now = time();
 $records = $DB->get_records_select('tool_bruteforce_blocks', 'unblocktime > :now', ['now'=>$now], 'timecreated DESC');
-$table = new html_table();
-$table->head = ['Type', get_string('ip', 'tool_bruteforce'), get_string('user'), get_string('time'), ''];
+  $table = new html_table();
+  $table->head = [get_string('type', 'tool_bruteforce'), get_string('ip', 'tool_bruteforce'), get_string('user'),
+      get_string('time'), ''];
 foreach ($records as $r) {
     $type = 'ip';
     $userdisplay = '';

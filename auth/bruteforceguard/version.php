@@ -27,3 +27,4 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'auth_bruteforceguard';
 $plugin->version   = 2024040902;
 $plugin->requires  = 2022041900; // Moodle 4.0.
+

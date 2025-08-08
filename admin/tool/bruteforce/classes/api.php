@@ -191,8 +191,10 @@ class api {
         }
         global $DB;
         $lists = [
-            'whitelist' => array_map('strtolower', $DB->get_fieldset_select('tool_bruteforce_userwhitelist', 'username', '1=1')), 
-            'blacklist' => array_map('strtolower', $DB->get_fieldset_select('tool_bruteforce_userblacklist', 'username', '1=1')),
+            'whitelist' => array_map('strtolower',
+                $DB->get_fieldset_select('tool_bruteforce_uwhitelist', 'username', '1=1')),
+            'blacklist' => array_map('strtolower',
+                $DB->get_fieldset_select('tool_bruteforce_ublacklist', 'username', '1=1')),
         ];
         $cache->set('lists', $lists, 300);
         return $lists;

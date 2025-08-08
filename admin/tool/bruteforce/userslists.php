@@ -9,7 +9,7 @@ class userlist_form extends moodleform {
     protected function definition() {
         $mform = $this->_form;
         $list = $this->_customdata['list'];
-        $mform->addElement('text', 'username', get_string('user')); $mform->setType('username', PARAM_RAW_TRIMMED);
+        $mform->addElement('text', 'username', get_string('user')); $mform->setType('username', PARAM_USERNAME);
         $mform->addElement('text', 'comment', get_string('comment', 'tool_bruteforce')); $mform->setType('comment', PARAM_RAW_TRIMMED);
         $mform->addElement('hidden', 'list', $list); $mform->setType('list', PARAM_ALPHA);
         $this->add_action_buttons(true, get_string('add', 'tool_bruteforce'));
@@ -22,13 +22,13 @@ $blacklistform = new userlist_form(null, ['list'=>'blacklist']);
 
 if ($data = $whitelistform->get_data()) {
     $record = (object)[ 'username'=>core_text::strtolower($data->username), 'comment'=>$data->comment, 'timecreated'=>time() ];
-    $DB->insert_record('tool_bruteforce_userwhitelist',$record);
+    $DB->insert_record('tool_bruteforce_uwhitelist',$record);
     \cache::make('tool_bruteforce','userlists')->purge();
     redirect(new moodle_url('/admin/tool/bruteforce/userslists.php'));
 }
 if ($data = $blacklistform->get_data()) {
     $record = (object)[ 'username'=>core_text::strtolower($data->username), 'comment'=>$data->comment, 'timecreated'=>time() ];
-    $DB->insert_record('tool_bruteforce_userblacklist',$record);
+    $DB->insert_record('tool_bruteforce_ublacklist',$record);
     \cache::make('tool_bruteforce','userlists')->purge();
     redirect(new moodle_url('/admin/tool/bruteforce/userslists.php'));
 }
@@ -36,13 +36,13 @@ if ($data = $blacklistform->get_data()) {
 $delw = optional_param('delw', 0, PARAM_INT);
 $delb = optional_param('delb', 0, PARAM_INT);
 if ($delw && confirm_sesskey()) {
-    $DB->delete_records('tool_bruteforce_userwhitelist',['id'=>$delw]);
-    \cache::make('tool_bruteforce','userlists')->purge();
+    $DB->delete_records('tool_bruteforce_uwhitelist', ['id' => $delw]);
+    \cache::make('tool_bruteforce', 'userlists')->purge();
     redirect(new moodle_url('/admin/tool/bruteforce/userslists.php'));
 }
 if ($delb && confirm_sesskey()) {
-    $DB->delete_records('tool_bruteforce_userblacklist',['id'=>$delb]);
-    \cache::make('tool_bruteforce','userlists')->purge();
+    $DB->delete_records('tool_bruteforce_ublacklist', ['id' => $delb]);
+    \cache::make('tool_bruteforce', 'userlists')->purge();
     redirect(new moodle_url('/admin/tool/bruteforce/userslists.php'));
 }
 
@@ -55,7 +55,7 @@ echo $OUTPUT->header();
 
 echo html_writer::tag('h3', get_string('whitelist', 'tool_bruteforce'));
 $whitelistform->display();
-$whitelist = $DB->get_records('tool_bruteforce_userwhitelist');
+$whitelist = $DB->get_records('tool_bruteforce_uwhitelist');
 if ($whitelist) {
     $table = new html_table();
     $table->head = [get_string('user'), get_string('comment', 'tool_bruteforce'), ''];
@@ -68,7 +68,7 @@ if ($whitelist) {
 
 echo html_writer::tag('h3', get_string('blacklist', 'tool_bruteforce'));
 $blacklistform->display();
-$blacklist = $DB->get_records('tool_bruteforce_userblacklist');
+$blacklist = $DB->get_records('tool_bruteforce_ublacklist');
 if ($blacklist) {
     $table = new html_table();
     $table->head = [get_string('user'), get_string('comment', 'tool_bruteforce'), ''];
@@ -80,3 +80,4 @@ if ($blacklist) {
 }
 
 echo $OUTPUT->footer();
+
