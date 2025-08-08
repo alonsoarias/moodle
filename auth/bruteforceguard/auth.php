@@ -69,7 +69,7 @@ class auth_plugin_bruteforceguard extends auth_plugin_base {
             }
         }
 
-        if (\tool_bruteforce\api::is_blocked($userid, $ip)) {
+        if (\tool_bruteforce\api::is_blocked($userid, $ip, $username ?: null)) {
             $msg = (string) get_config('tool_bruteforce', 'blockedmessage');
             if ($msg === '') {
                 $msg = get_string('blockedmessage', 'tool_bruteforce');

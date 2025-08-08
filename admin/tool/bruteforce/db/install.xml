@@ -4,28 +4,40 @@
         <TABLE NAME="tool_bruteforce_attempts" COMMENT="Failed login counters">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0"/>
-                <FIELD NAME="ip" TYPE="char" LENGTH="45" NOTNULL="true"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false"/>
+                <FIELD NAME="username" TYPE="char" LENGTH="100" NOTNULL="false"/>
+                <FIELD NAME="ip" TYPE="char" LENGTH="45" NOTNULL="false"/>
                 <FIELD NAME="count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
                 <FIELD NAME="firstfail" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
                 <FIELD NAME="lastfail" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="userip" TYPE="unique" FIELDS="userid, ip"/>
             </KEYS>
+            <INDEXES>
+                <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+                <INDEX NAME="username" UNIQUE="false" FIELDS="username"/>
+                <INDEX NAME="ip" UNIQUE="false" FIELDS="ip"/>
+            </INDEXES>
         </TABLE>
         <TABLE NAME="tool_bruteforce_blocks" COMMENT="Active blocks">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0"/>
-                <FIELD NAME="ip" TYPE="char" LENGTH="45" NOTNULL="true"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false"/>
+                <FIELD NAME="username" TYPE="char" LENGTH="100" NOTNULL="false"/>
+                <FIELD NAME="ip" TYPE="char" LENGTH="45" NOTNULL="false"/>
                 <FIELD NAME="unblocktime" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
             </KEYS>
+            <INDEXES>
+                <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+                <INDEX NAME="username" UNIQUE="false" FIELDS="username"/>
+                <INDEX NAME="ip" UNIQUE="false" FIELDS="ip"/>
+                <INDEX NAME="unblocktime" UNIQUE="false" FIELDS="unblocktime"/>
+            </INDEXES>
         </TABLE>
         <TABLE NAME="tool_bruteforce_oneday" COMMENT="One day blocks">
             <FIELDS>
@@ -55,7 +67,32 @@
             <INDEXES>
                 <INDEX NAME="ip" UNIQUE="false" FIELDS="ip"/>
                 <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+                <INDEX NAME="username" UNIQUE="false" FIELDS="username"/>
             </INDEXES>
+        </TABLE>
+        <TABLE NAME="tool_bruteforce_userwhitelist" COMMENT="User whitelist">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="username" TYPE="char" LENGTH="100" NOTNULL="true"/>
+                <FIELD NAME="comment" TYPE="char" LENGTH="255" NOTNULL="false"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="username_unique" TYPE="unique" FIELDS="username"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="tool_bruteforce_userblacklist" COMMENT="User blacklist">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="username" TYPE="char" LENGTH="100" NOTNULL="true"/>
+                <FIELD NAME="comment" TYPE="char" LENGTH="255" NOTNULL="false"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="username_unique" TYPE="unique" FIELDS="username"/>
+            </KEYS>
         </TABLE>
     </TABLES>
 </XMLDB>

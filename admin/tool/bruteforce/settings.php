@@ -1,106 +1,59 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-/**
- * Settings for tool_bruteforce plugin.
- *
- * @package    tool_bruteforce
- * @copyright  2024 The Moodle Project
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+// Settings for tool_bruteforce plugin.
 
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
     $settings = new admin_settingpage('tool_bruteforce', get_string('pluginname', 'tool_bruteforce'));
 
-    // Soft threshold configuration
-    $settings->add(new admin_setting_configtext(
-        'tool_bruteforce/thresholdsoft',
-        get_string('thresholdsoft', 'tool_bruteforce'),
-        get_string('thresholdsoft_desc', 'tool_bruteforce'),
-        3,
-        PARAM_INT
-    ));
+    // IP axis.
+    $settings->add(new admin_setting_heading('tool_bruteforce_ip', get_string('ipaxis', 'tool_bruteforce'), ''));
+    $settings->add(new admin_setting_configtext('tool_bruteforce/ip_thresholdsoft',
+        get_string('thresholdsoft', 'tool_bruteforce'), '', 3, PARAM_INT));
+    $settings->add(new admin_setting_configduration('tool_bruteforce/ip_durationsoft',
+        get_string('durationsoft', 'tool_bruteforce'), '', 300));
+    $settings->add(new admin_setting_configtext('tool_bruteforce/ip_thresholdhard',
+        get_string('thresholdhard', 'tool_bruteforce'), '', 5, PARAM_INT));
+    $settings->add(new admin_setting_configduration('tool_bruteforce/ip_durationhard',
+        get_string('durationhard', 'tool_bruteforce'), '', 3600));
 
-    // Soft block duration
-    $settings->add(new admin_setting_configduration(
-        'tool_bruteforce/durationsoft',
-        get_string('durationsoft', 'tool_bruteforce'),
-        get_string('durationsoft_desc', 'tool_bruteforce'),
-        300
-    ));
+    // User axis.
+    $settings->add(new admin_setting_heading('tool_bruteforce_user', get_string('useraxis', 'tool_bruteforce'), ''));
+    $settings->add(new admin_setting_configtext('tool_bruteforce/user_thresholdsoft',
+        get_string('thresholdsoft', 'tool_bruteforce'), '', 3, PARAM_INT));
+    $settings->add(new admin_setting_configduration('tool_bruteforce/user_durationsoft',
+        get_string('durationsoft', 'tool_bruteforce'), '', 300));
+    $settings->add(new admin_setting_configtext('tool_bruteforce/user_thresholdhard',
+        get_string('thresholdhard', 'tool_bruteforce'), '', 5, PARAM_INT));
+    $settings->add(new admin_setting_configduration('tool_bruteforce/user_durationhard',
+        get_string('durationhard', 'tool_bruteforce'), '', 3600));
 
-    // Hard threshold configuration
-    $settings->add(new admin_setting_configtext(
-        'tool_bruteforce/thresholdhard',
-        get_string('thresholdhard', 'tool_bruteforce'),
-        get_string('thresholdhard_desc', 'tool_bruteforce'),
-        5,
-        PARAM_INT
-    ));
+    // Pair axis.
+    $settings->add(new admin_setting_heading('tool_bruteforce_pair', get_string('pairaxis', 'tool_bruteforce'), ''));
+    $settings->add(new admin_setting_configtext('tool_bruteforce/pair_thresholdsoft',
+        get_string('thresholdsoft', 'tool_bruteforce'), '', 3, PARAM_INT));
+    $settings->add(new admin_setting_configduration('tool_bruteforce/pair_durationsoft',
+        get_string('durationsoft', 'tool_bruteforce'), '', 300));
+    $settings->add(new admin_setting_configtext('tool_bruteforce/pair_thresholdhard',
+        get_string('thresholdhard', 'tool_bruteforce'), '', 5, PARAM_INT));
+    $settings->add(new admin_setting_configduration('tool_bruteforce/pair_durationhard',
+        get_string('durationhard', 'tool_bruteforce'), '', 3600));
 
-    // Hard block duration
-    $settings->add(new admin_setting_configduration(
-        'tool_bruteforce/durationhard',
-        get_string('durationhard', 'tool_bruteforce'),
-        get_string('durationhard_desc', 'tool_bruteforce'),
-        3600
-    ));
-
-    // Time window for counting attempts
-    $settings->add(new admin_setting_configduration(
-        'tool_bruteforce/window',
-        get_string('window', 'tool_bruteforce'),
-        get_string('window_desc', 'tool_bruteforce'),
-        300
-    ));
-
-    // One day block threshold
-    $settings->add(new admin_setting_configtext(
-        'tool_bruteforce/onedaythreshold',
-        get_string('onedaythreshold', 'tool_bruteforce'),
-        get_string('onedaythreshold_desc', 'tool_bruteforce'),
-        50,
-        PARAM_INT
-    ));
-
-    // Message displayed when access is blocked.
-    $settings->add(new admin_setting_configtext(
-        'tool_bruteforce/blockedmessage',
-        get_string('blockedmessage', 'tool_bruteforce'),
-        '',
-        get_string('blockedmessage', 'tool_bruteforce')
-    ));
-
-    // Time window for revoking freshly created tokens.
-    $settings->add(new admin_setting_configduration(
-        'tool_bruteforce/tokenrevokewindow',
-        get_string('tokenrevokewindow', 'tool_bruteforce'),
-        get_string('tokenrevokewindow_desc', 'tool_bruteforce'),
-        5
-    ));
-
-    // Coalesce window.
-    $settings->add(new admin_setting_configduration(
-        'tool_bruteforce/coalescewindow',
-        get_string('coalescewindow', 'tool_bruteforce'),
-        get_string('coalescewindow_desc', 'tool_bruteforce'),
-        0
-    ));
+    // Misc settings.
+    $settings->add(new admin_setting_configtext('tool_bruteforce/onedaythreshold',
+        get_string('onedaythreshold', 'tool_bruteforce'), '', 50, PARAM_INT));
+    $settings->add(new admin_setting_configduration('tool_bruteforce/onedayduration',
+        get_string('onedayduration', 'tool_bruteforce'), '', DAYSECS));
+    $settings->add(new admin_setting_configtext('tool_bruteforce/blockedmessage',
+        get_string('blockedmessage', 'tool_bruteforce'), '', get_string('blockedmessage', 'tool_bruteforce')));
+    $settings->add(new admin_setting_configduration('tool_bruteforce/tokenrevokewindow',
+        get_string('tokenrevokewindow', 'tool_bruteforce'), '', 5));
+    $settings->add(new admin_setting_configduration('tool_bruteforce/coalescewindow',
+        get_string('coalescewindow', 'tool_bruteforce'), '', 0));
+    $settings->add(new admin_setting_configtext('tool_bruteforce/window',
+        get_string('window', 'tool_bruteforce'), '', 300, PARAM_INT));
+    $settings->add(new admin_setting_configtext('tool_bruteforce/retention',
+        get_string('retention', 'tool_bruteforce'), '', 30, PARAM_INT));
 
     $ADMIN->add('security', $settings);
 }

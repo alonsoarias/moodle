@@ -142,4 +142,17 @@ class api_test extends advanced_testcase {
         $this->assertEquals(1, $record->count);
         $this->assertFalse(api::is_blocked(null, '1.2.3.4'));
     }
+
+    public function test_user_lists() {
+        global $DB;
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user(['username' => 'foo']);
+        $DB->insert_record('tool_bruteforce_userblacklist', ['username' => 'foo', 'timecreated' => time()]);
+        \cache::make('tool_bruteforce', 'userlists')->purge();
+        $this->assertTrue(api::is_user_blacklisted($user->id, 'foo'));
+
+        $DB->insert_record('tool_bruteforce_userwhitelist', ['username' => 'bar', 'timecreated' => time()]);
+        \cache::make('tool_bruteforce', 'userlists')->purge();
+        $this->assertTrue(api::is_user_whitelisted(null, 'bar'));
+    }
 }

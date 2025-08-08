@@ -13,4 +13,13 @@ $tasks = [
         'dayofweek' => '*',
         'month' => '*'
     ],
+    [
+        'classname' => '\\tool_bruteforce\\task\\rotate_history',
+        'blocking' => 0,
+        'minute' => '30',
+        'hour' => '2',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ],
 ];

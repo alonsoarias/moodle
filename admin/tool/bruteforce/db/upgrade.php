@@ -134,5 +134,83 @@ function xmldb_tool_bruteforce_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2024040500, 'tool', 'bruteforce');
     }
 
+    if ($oldversion < 2024040600) {
+        $table = new xmldb_table('tool_bruteforce_attempts');
+        if (!$dbman->field_exists($table, new xmldb_field('username'))) {
+            $dbman->add_field($table, new xmldb_field('username', XMLDB_TYPE_CHAR, '100', null, null, null, null));
+        }
+        if ($dbman->field_exists($table, new xmldb_field('ip'))) {
+            $field = new xmldb_field('ip', XMLDB_TYPE_CHAR, '45', null, null, null, null);
+            $dbman->change_field_notnull($table, $field);
+        }
+        $index = new xmldb_index('username', XMLDB_INDEX_NOTUNIQUE, ['username']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('ip', XMLDB_INDEX_NOTUNIQUE, ['ip']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $table = new xmldb_table('tool_bruteforce_blocks');
+        if (!$dbman->field_exists($table, new xmldb_field('username'))) {
+            $dbman->add_field($table, new xmldb_field('username', XMLDB_TYPE_CHAR, '100', null, null, null, null));
+        }
+        if ($dbman->field_exists($table, new xmldb_field('ip'))) {
+            $field = new xmldb_field('ip', XMLDB_TYPE_CHAR, '45', null, null, null, null);
+            $dbman->change_field_notnull($table, $field);
+        }
+        $index = new xmldb_index('username', XMLDB_INDEX_NOTUNIQUE, ['username']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('ip', XMLDB_INDEX_NOTUNIQUE, ['ip']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        $index = new xmldb_index('unblocktime', XMLDB_INDEX_NOTUNIQUE, ['unblocktime']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $table = new xmldb_table('tool_bruteforce_audit');
+        $index = new xmldb_index('username', XMLDB_INDEX_NOTUNIQUE, ['username']);
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        $table = new xmldb_table('tool_bruteforce_userwhitelist');
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+            $table->add_field('username', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
+            $table->add_field('comment', XMLDB_TYPE_CHAR, '255', null, null);
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $table->add_key('username_unique', XMLDB_KEY_UNIQUE, ['username']);
+            $dbman->create_table($table);
+        }
+
+        $table = new xmldb_table('tool_bruteforce_userblacklist');
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+            $table->add_field('username', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
+            $table->add_field('comment', XMLDB_TYPE_CHAR, '255', null, null);
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0);
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $table->add_key('username_unique', XMLDB_KEY_UNIQUE, ['username']);
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2024040600, 'tool', 'bruteforce');
+    }
+
     return true;
 }
