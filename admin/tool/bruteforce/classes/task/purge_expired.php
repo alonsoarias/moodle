@@ -6,7 +6,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Scheduled task to purge expired blocks and old attempts.
  */
-class purge_expired extends \core\scheduled_task {
+class purge_expired extends \core\task\scheduled_task {
     public function get_name() {
         return get_string('pluginname', 'tool_bruteforce');
     }

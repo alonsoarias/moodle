@@ -6,7 +6,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Scheduled task to purge old history records.
  */
-class rotate_history extends \core\scheduled_task {
+class rotate_history extends \core\task\scheduled_task {
     public function get_name() {
         return get_string('pluginname', 'tool_bruteforce');
     }

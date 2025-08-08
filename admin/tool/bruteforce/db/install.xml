@@ -70,7 +70,7 @@
                 <INDEX NAME="username" UNIQUE="false" FIELDS="username"/>
             </INDEXES>
         </TABLE>
-        <TABLE NAME="tool_bruteforce_userwhitelist" COMMENT="User whitelist">
+        <TABLE NAME="tool_bruteforce_uwhitelist" COMMENT="User whitelist">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="username" TYPE="char" LENGTH="100" NOTNULL="true"/>
@@ -82,7 +82,7 @@
                 <KEY NAME="username_unique" TYPE="unique" FIELDS="username"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="tool_bruteforce_userblacklist" COMMENT="User blacklist">
+        <TABLE NAME="tool_bruteforce_ublacklist" COMMENT="User blacklist">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="username" TYPE="char" LENGTH="100" NOTNULL="true"/>

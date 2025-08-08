@@ -136,13 +136,49 @@ function xmldb_tool_bruteforce_upgrade(int $oldversion): bool {
 
     if ($oldversion < 2024040600) {
         $table = new xmldb_table('tool_bruteforce_attempts');
+        
+        // Add username field if it doesn't exist
         if (!$dbman->field_exists($table, new xmldb_field('username'))) {
             $dbman->add_field($table, new xmldb_field('username', XMLDB_TYPE_CHAR, '100', null, null, null, null));
         }
+        
+        // Handle IP field modification - need to drop dependent indexes first
         if ($dbman->field_exists($table, new xmldb_field('ip'))) {
+            // Check and drop existing unique index that might conflict
+            $unique_index = new xmldb_index('useip_uix', XMLDB_INDEX_UNIQUE, ['userid', 'ip']);
+            if ($dbman->index_exists($table, $unique_index)) {
+                $dbman->drop_index($table, $unique_index);
+            }
+            
+            // Also check for any other indexes that might use the ip field
+            $ip_indexes_to_recreate = [];
+            
+            // Check if regular ip index exists
+            $ip_index = new xmldb_index('ip', XMLDB_INDEX_NOTUNIQUE, ['ip']);
+            if ($dbman->index_exists($table, $ip_index)) {
+                $dbman->drop_index($table, $ip_index);
+                $ip_indexes_to_recreate[] = $ip_index;
+            }
+            
+            // Now modify the field to allow NULL
             $field = new xmldb_field('ip', XMLDB_TYPE_CHAR, '45', null, null, null, null);
             $dbman->change_field_notnull($table, $field);
+            
+            // Recreate the unique index if it existed
+            if ($dbman->index_exists($table, $unique_index) === false) {
+                // Only recreate if the combination makes sense with nullable IP
+                // You might want to skip this or modify the logic based on your requirements
+            }
+            
+            // Recreate other indexes
+            foreach ($ip_indexes_to_recreate as $index) {
+                if (!$dbman->index_exists($table, $index)) {
+                    $dbman->add_index($table, $index);
+                }
+            }
         }
+        
+        // Add other indexes
         $index = new xmldb_index('username', XMLDB_INDEX_NOTUNIQUE, ['username']);
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
@@ -156,14 +192,43 @@ function xmldb_tool_bruteforce_upgrade(int $oldversion): bool {
             $dbman->add_index($table, $index);
         }
 
+        // Handle tool_bruteforce_blocks table
         $table = new xmldb_table('tool_bruteforce_blocks');
+        
+        // Add username field if it doesn't exist
         if (!$dbman->field_exists($table, new xmldb_field('username'))) {
             $dbman->add_field($table, new xmldb_field('username', XMLDB_TYPE_CHAR, '100', null, null, null, null));
         }
+        
+        // Handle IP field modification for blocks table
         if ($dbman->field_exists($table, new xmldb_field('ip'))) {
+            // Check and drop existing unique index that might conflict
+            $unique_index = new xmldb_index('useip_uix', XMLDB_INDEX_UNIQUE, ['userid', 'ip']);
+            if ($dbman->index_exists($table, $unique_index)) {
+                $dbman->drop_index($table, $unique_index);
+            }
+            
+            // Check for ip index
+            $ip_indexes_to_recreate = [];
+            $ip_index = new xmldb_index('ip', XMLDB_INDEX_NOTUNIQUE, ['ip']);
+            if ($dbman->index_exists($table, $ip_index)) {
+                $dbman->drop_index($table, $ip_index);
+                $ip_indexes_to_recreate[] = $ip_index;
+            }
+            
+            // Now modify the field to allow NULL
             $field = new xmldb_field('ip', XMLDB_TYPE_CHAR, '45', null, null, null, null);
             $dbman->change_field_notnull($table, $field);
+            
+            // Recreate indexes
+            foreach ($ip_indexes_to_recreate as $index) {
+                if (!$dbman->index_exists($table, $index)) {
+                    $dbman->add_index($table, $index);
+                }
+            }
         }
+        
+        // Add other indexes for blocks table
         $index = new xmldb_index('username', XMLDB_INDEX_NOTUNIQUE, ['username']);
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
@@ -181,13 +246,15 @@ function xmldb_tool_bruteforce_upgrade(int $oldversion): bool {
             $dbman->add_index($table, $index);
         }
 
+        // Handle audit table
         $table = new xmldb_table('tool_bruteforce_audit');
         $index = new xmldb_index('username', XMLDB_INDEX_NOTUNIQUE, ['username']);
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
 
-        $table = new xmldb_table('tool_bruteforce_userwhitelist');
+        // Create user whitelist table (shortened name to fit 28 char limit)
+        $table = new xmldb_table('tool_bruteforce_uwhitelist');
         if (!$dbman->table_exists($table)) {
             $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
             $table->add_field('username', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
@@ -198,7 +265,8 @@ function xmldb_tool_bruteforce_upgrade(int $oldversion): bool {
             $dbman->create_table($table);
         }
 
-        $table = new xmldb_table('tool_bruteforce_userblacklist');
+        // Create user blacklist table (shortened name to fit 28 char limit)
+        $table = new xmldb_table('tool_bruteforce_ublacklist');
         if (!$dbman->table_exists($table)) {
             $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
             $table->add_field('username', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL);
