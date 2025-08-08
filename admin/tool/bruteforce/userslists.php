@@ -1,9 +1,9 @@
 <?php
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir.'/formslib.php');
-require_login();
+require_once($CFG->libdir . '/adminlib.php');
+admin_externalpage_setup('tool_bruteforce_userslists');
 $context = context_system::instance();
-require_capability('tool/bruteforce:manage', $context);
 
 class userlist_form extends moodleform {
     protected function definition() {
@@ -45,11 +45,6 @@ if ($delb && confirm_sesskey()) {
     \cache::make('tool_bruteforce', 'userlists')->purge();
     redirect(new moodle_url('/admin/tool/bruteforce/userslists.php'));
 }
-
-$PAGE->set_url(new moodle_url('/admin/tool/bruteforce/userslists.php'));
-$PAGE->set_context($context);
-$PAGE->set_title(get_string('lists', 'tool_bruteforce'));
-$PAGE->set_heading(get_string('lists', 'tool_bruteforce'));
 
 echo $OUTPUT->header();
 

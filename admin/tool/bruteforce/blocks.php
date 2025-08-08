@@ -1,12 +1,12 @@
 <?php
 require_once(__DIR__ . '/../../../config.php');
-require_login();
-$context = context_system::instance();
-require_capability('tool/bruteforce:manage', $context);
-
+require_once($CFG->libdir . '/adminlib.php');
+admin_externalpage_setup('tool_bruteforce_blocks');
 global $DB;
 
+$context = context_system::instance();
 $unblock = optional_param('unblock', 0, PARAM_INT);
+
 if ($unblock && confirm_sesskey()) {
     require_capability('tool/bruteforce:unblock', $context);
     $DB->delete_records('tool_bruteforce_blocks', ['id' => $unblock]);
@@ -14,18 +14,15 @@ if ($unblock && confirm_sesskey()) {
     redirect(new moodle_url('/admin/tool/bruteforce/blocks.php'));
 }
 
-$PAGE->set_url(new moodle_url('/admin/tool/bruteforce/blocks.php'));
-$PAGE->set_context($context);
-$PAGE->set_title(get_string('pluginname', 'tool_bruteforce'));
-$PAGE->set_heading(get_string('pluginname', 'tool_bruteforce'));
-
 echo $OUTPUT->header();
 
 $now = time();
 $records = $DB->get_records_select('tool_bruteforce_blocks', 'unblocktime > :now', ['now'=>$now], 'timecreated DESC');
-  $table = new html_table();
-  $table->head = [get_string('type', 'tool_bruteforce'), get_string('ip', 'tool_bruteforce'), get_string('user'),
-      get_string('time'), ''];
+
+$table = new html_table();
+$table->head = [get_string('type', 'tool_bruteforce'), get_string('ip', 'tool_bruteforce'), get_string('user'),
+    get_string('time'), ''];
+
 foreach ($records as $r) {
     $type = 'ip';
     $userdisplay = '';
@@ -47,6 +44,7 @@ foreach ($records as $r) {
         html_writer::link(new moodle_url('/admin/tool/bruteforce/blocks.php', ['unblock'=>$r->id, 'sesskey'=>sesskey()]), get_string('delete')) : '';
     $table->data[] = [$type, s($r->ip), $userdisplay, $expires, $action];
 }
+
 if ($table->data) {
     echo html_writer::table($table);
 } else {

@@ -1,15 +1,8 @@
 <?php
 require_once(__DIR__ . '/../../../config.php');
-require_login();
-$context = context_system::instance();
-require_capability('tool/bruteforce:view', $context);
-
+require_once($CFG->libdir . '/adminlib.php');
+admin_externalpage_setup('tool_bruteforce_dashboard');
 global $CFG, $DB;
-
-$PAGE->set_url(new moodle_url('/admin/tool/bruteforce/index.php'));
-$PAGE->set_context($context);
-$PAGE->set_title(get_string('pluginname', 'tool_bruteforce'));
-$PAGE->set_heading(get_string('pluginname', 'tool_bruteforce'));
 
 echo $OUTPUT->header();
 
