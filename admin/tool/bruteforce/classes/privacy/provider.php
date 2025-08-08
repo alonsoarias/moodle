@@ -15,6 +15,8 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         $items->add_database_table('tool_bruteforce_blocks', ['userid' => 'privacy:metadata:userid', 'username' => 'privacy:metadata:username', 'ip' => 'privacy:metadata:ip'], 'privacy:metadata:blocks');
         $items->add_database_table('tool_bruteforce_oneday', ['ip' => 'privacy:metadata:ip'], 'privacy:metadata:oneday');
         $items->add_database_table('tool_bruteforce_audit', ['userid' => 'privacy:metadata:userid', 'username' => 'privacy:metadata:username', 'ip' => 'privacy:metadata:ip'], 'privacy:metadata:audit');
+        $items->add_database_table('tool_bruteforce_uwhitelist', ['username' => 'privacy:metadata:username', 'comment' => 'privacy:metadata:comment'], 'privacy:metadata:userlist');
+        $items->add_database_table('tool_bruteforce_ublacklist', ['username' => 'privacy:metadata:username', 'comment' => 'privacy:metadata:comment'], 'privacy:metadata:userlist');
         return $items;
     }
 
@@ -30,9 +32,18 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
 
     protected static function record_exists(int $userid): bool {
         global $DB;
-        return $DB->record_exists('tool_bruteforce_attempts', ['userid'=>$userid]) ||
-               $DB->record_exists('tool_bruteforce_blocks', ['userid'=>$userid]) ||
-               $DB->record_exists('tool_bruteforce_audit', ['userid'=>$userid]);
+        $exists = $DB->record_exists('tool_bruteforce_attempts', ['userid' => $userid]) ||
+                  $DB->record_exists('tool_bruteforce_blocks', ['userid' => $userid]) ||
+                  $DB->record_exists('tool_bruteforce_audit', ['userid' => $userid]);
+        if (!$exists) {
+            $username = $DB->get_field('user', 'username', ['id' => $userid], IGNORE_MISSING);
+            if ($username) {
+                $username = \core_text::strtolower($username);
+                $exists = $DB->record_exists('tool_bruteforce_uwhitelist', ['username' => $username]) ||
+                          $DB->record_exists('tool_bruteforce_ublacklist', ['username' => $username]);
+            }
+        }
+        return $exists;
     }
 
     public static function export_user_data(approved_contextlist $contextlist) {
@@ -43,9 +54,15 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         $userid = $contextlist->get_user()->id;
         $context = context_system::instance();
         $data = new \stdClass();
-        $data->attempts = $DB->get_records('tool_bruteforce_attempts', ['userid'=>$userid]);
-        $data->blocks = $DB->get_records('tool_bruteforce_blocks', ['userid'=>$userid]);
-        $data->audit = $DB->get_records('tool_bruteforce_audit', ['userid'=>$userid]);
+        $data->attempts = $DB->get_records('tool_bruteforce_attempts', ['userid' => $userid]);
+        $data->blocks = $DB->get_records('tool_bruteforce_blocks', ['userid' => $userid]);
+        $data->audit = $DB->get_records('tool_bruteforce_audit', ['userid' => $userid]);
+        $username = $DB->get_field('user', 'username', ['id' => $userid], IGNORE_MISSING);
+        if ($username) {
+            $username = \core_text::strtolower($username);
+            $data->userwhitelist = $DB->get_records('tool_bruteforce_uwhitelist', ['username' => $username]);
+            $data->userblacklist = $DB->get_records('tool_bruteforce_ublacklist', ['username' => $username]);
+        }
         writer::with_context($context)->export_data([], $data);
     }
 
@@ -55,6 +72,8 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         $DB->delete_records('tool_bruteforce_blocks');
         $DB->delete_records('tool_bruteforce_oneday');
         $DB->delete_records('tool_bruteforce_audit');
+        $DB->delete_records('tool_bruteforce_uwhitelist');
+        $DB->delete_records('tool_bruteforce_ublacklist');
     }
 
     public static function delete_data_for_user(approved_contextlist $contextlist) {
@@ -63,8 +82,14 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             return;
         }
         $userid = $contextlist->get_user()->id;
-        $DB->delete_records('tool_bruteforce_attempts', ['userid'=>$userid]);
-        $DB->delete_records('tool_bruteforce_blocks', ['userid'=>$userid]);
-        $DB->delete_records('tool_bruteforce_audit', ['userid'=>$userid]);
+        $DB->delete_records('tool_bruteforce_attempts', ['userid' => $userid]);
+        $DB->delete_records('tool_bruteforce_blocks', ['userid' => $userid]);
+        $DB->delete_records('tool_bruteforce_audit', ['userid' => $userid]);
+        $username = $DB->get_field('user', 'username', ['id' => $userid], IGNORE_MISSING);
+        if ($username) {
+            $username = \core_text::strtolower($username);
+            $DB->delete_records('tool_bruteforce_uwhitelist', ['username' => $username]);
+            $DB->delete_records('tool_bruteforce_ublacklist', ['username' => $username]);
+        }
     }
 }

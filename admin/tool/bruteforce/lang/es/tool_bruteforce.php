@@ -66,4 +66,6 @@ $string['privacy:metadata:attempts'] = 'Intentos de inicio de sesión fallidos.'
 $string['privacy:metadata:blocks'] = 'Bloqueos activos.';
 $string['privacy:metadata:oneday'] = 'Bloqueos de un día.';
 $string['privacy:metadata:audit'] = 'Entradas de auditoría.';
+$string['privacy:metadata:userlist'] = 'Listas de usuarios permitidos/prohibidos.';
+$string['privacy:metadata:comment'] = 'Comentario de la entrada.';
 
