@@ -4,19 +4,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    // Navigation links under Site administration -> Security.
-    $ADMIN->add('security', new admin_externalpage('tool_bruteforce_dashboard',
-        get_string('dashboard', 'tool_bruteforce'),
-        new moodle_url('/admin/tool/bruteforce/index.php'), 'tool/bruteforce:view'));
-    $ADMIN->add('security', new admin_externalpage('tool_bruteforce_blocks',
-        get_string('blocks', 'tool_bruteforce'),
-        new moodle_url('/admin/tool/bruteforce/blocks.php'), 'tool/bruteforce:manage'));
-    $ADMIN->add('security', new admin_externalpage('tool_bruteforce_history',
-        get_string('history', 'tool_bruteforce'),
-        new moodle_url('/admin/tool/bruteforce/history.php'), 'tool/bruteforce:view'));
-    $ADMIN->add('security', new admin_externalpage('tool_bruteforce_userslists',
-        get_string('lists', 'tool_bruteforce'),
-        new moodle_url('/admin/tool/bruteforce/userslists.php'), 'tool/bruteforce:manage'));
+    // Single entry under Site administration -> Security.
+    $ADMIN->add('security', new admin_externalpage('tool_bruteforce_manage',
+        get_string('pluginname', 'tool_bruteforce'),
+        new moodle_url('/admin/tool/bruteforce/manage.php'), 'tool/bruteforce:view'));
 
     $settings = new admin_settingpage('tool_bruteforce', get_string('pluginname', 'tool_bruteforce'));
 

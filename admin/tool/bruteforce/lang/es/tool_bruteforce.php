@@ -49,6 +49,8 @@ $string['durationpreset'] = 'Duración predefinida';
 $string['expiresin'] = 'Expira en';
 $string['expiresat'] = 'Expira el';
 $string['note'] = 'Nota';
+$string['created'] = 'Creado';
+$string['unblock'] = 'Desbloquear';
 $string['apply'] = 'Aplicar';
 $string['cancel'] = 'Cancelar';
 $string['confirmbulkdelete'] = '¿Seguro que deseas eliminar las entradas seleccionadas?';
@@ -63,3 +65,4 @@ $string['privacy:metadata:attempts'] = 'Intentos de inicio de sesión fallidos.'
 $string['privacy:metadata:blocks'] = 'Bloqueos activos.';
 $string['privacy:metadata:oneday'] = 'Bloqueos de un día.';
 $string['privacy:metadata:audit'] = 'Entradas de auditoría.';
+
