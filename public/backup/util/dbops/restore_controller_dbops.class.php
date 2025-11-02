@@ -94,13 +94,27 @@ abstract class restore_controller_dbops extends restore_dbops {
         if (! $controllerrec = $DB->get_record('backup_controllers', array('backupid' => $restoreid))) {
             throw new backup_dbops_exception('restore_controller_dbops_nonexisting');
         }
-        $controller = unserialize(base64_decode($controllerrec->controller));
+
+        // Suppress warnings from unserialize in PHP 8.2+ for dynamic properties.
+        $controller = @unserialize(base64_decode($controllerrec->controller));
+
+        // Check for unserialize errors.
+        if ($controller === false && $controllerrec->controller !== 'YjowOw==') { // 'YjowOw==' is base64(serialize(false))
+            throw new backup_dbops_exception('restore_controller_dbops_loading_unserialize_failed');
+        }
+
         if (!is_object($controller)) {
             // The controller field of the table did not contain a serialized object.
             // It is made empty after it has been used successfully, it is likely that
             // the user has pressed the browser back button at some point.
             throw new backup_dbops_exception('restore_controller_dbops_loading_invalid_controller');
         }
+
+        // Verify the controller is of the expected type.
+        if (!($controller instanceof restore_controller)) {
+            throw new backup_dbops_exception('restore_controller_dbops_loading_invalid_controller');
+        }
+
         // Check checksum is ok. Sounds silly but it isn't ;-)
         if (!$controller->is_checksum_correct($controllerrec->checksum)) {
             throw new backup_dbops_exception('restore_controller_dbops_loading_checksum_mismatch');

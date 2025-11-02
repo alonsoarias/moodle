@@ -31,6 +31,7 @@
  *
  * TODO: Finish phpdocs
  */
+#[\AllowDynamicProperties]
 abstract class backup implements checksumable {
 
     // Backup type

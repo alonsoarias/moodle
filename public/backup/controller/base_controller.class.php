@@ -22,6 +22,7 @@
  * @copyright 2013 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\AllowDynamicProperties]
 abstract class base_controller extends backup implements loggable {
     /**
      * @var \core\progress\base Progress reporting object.
