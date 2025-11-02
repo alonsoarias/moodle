@@ -1,0 +1,19 @@
+--- a/public/lib/classes/task/asynchronous_copy_task.php
++++ b/public/lib/classes/task/asynchronous_copy_task.php
+@@ -129,9 +129,13 @@ class asynchronous_copy_task extends adhoc_task {
+         $shortname->set_value($copyinfo->shortname);
+
+         // Create and dispatch a hook to allow interaction with the task immediately prior to execution.
+-        $hook = new before_copy_course_execute($plan, $copyinfo);
+-        di::get(manager::class)->dispatch($hook);
+-
++        // TEMPORARY FIX: Disable hook dispatch to debug hanging issue
++        try {
++            $hook = new before_copy_course_execute($plan, $copyinfo);
++            di::get(manager::class)->dispatch($hook);
++        } catch (\Exception $e) {
++            mtrace('Course copy: Warning - Hook dispatch failed: ' . $e->getMessage());
++        }
+         // Do some preflight checks on the restore.
+         $rc->execute_precheck();
+         $status = $rc->get_status();
