@@ -104,27 +104,13 @@ abstract class backup_controller_dbops extends backup_dbops {
         if (! $controllerrec = $DB->get_record('backup_controllers', array('backupid' => $backupid))) {
             throw new backup_dbops_exception('backup_controller_dbops_nonexisting');
         }
-
-        // Suppress warnings from unserialize in PHP 8.2+ for dynamic properties.
-        $controller = @unserialize(base64_decode($controllerrec->controller));
-
-        // Check for unserialize errors.
-        if ($controller === false && $controllerrec->controller !== 'YjowOw==') { // 'YjowOw==' is base64(serialize(false))
-            throw new backup_dbops_exception('backup_controller_dbops_loading_unserialize_failed');
-        }
-
+        $controller = unserialize(base64_decode($controllerrec->controller));
         if (!is_object($controller)) {
             // The controller field of the table did not contain a serialized object.
             // It is made empty after it has been used successfully, it is likely that
             // the user has pressed the browser back button at some point.
             throw new backup_dbops_exception('backup_controller_dbops_loading_invalid_controller');
         }
-
-        // Verify the controller is of the expected type.
-        if (!($controller instanceof backup_controller)) {
-            throw new backup_dbops_exception('backup_controller_dbops_loading_invalid_controller');
-        }
-
         // Check checksum is ok. Sounds silly but it isn't ;-)
         if (!$controller->is_checksum_correct($controllerrec->checksum)) {
             throw new backup_dbops_exception('backup_controller_dbops_loading_checksum_mismatch');
@@ -232,19 +218,7 @@ abstract class backup_controller_dbops extends backup_dbops {
     public static function decode_backup_temp_info($info) {
         // We encode all data except null.
         if ($info != null) {
-            $decoded = @base64_decode($info);
-            if ($decoded === false) {
-                throw new backup_dbops_exception('backup_controller_dbops_decode_base64_failed');
-            }
-            $uncompressed = @gzuncompress($decoded);
-            if ($uncompressed === false) {
-                throw new backup_dbops_exception('backup_controller_dbops_decode_uncompress_failed');
-            }
-            $result = @unserialize($uncompressed);
-            if ($result === false && $uncompressed !== 'b:0;') {
-                throw new backup_dbops_exception('backup_controller_dbops_decode_unserialize_failed');
-            }
-            return $result;
+            return unserialize(gzuncompress(base64_decode($info)));
         }
         return $info;
     }
